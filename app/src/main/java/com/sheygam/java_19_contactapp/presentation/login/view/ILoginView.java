@@ -9,7 +9,7 @@ public interface ILoginView extends MvpView {
     void showProgress();
     void hideProgress();
     void showNextView();
-    void emailValidsError(String error);
+    void emailValidError(String error);
     void passValidError(String error);
     void showError(String error);
 }
