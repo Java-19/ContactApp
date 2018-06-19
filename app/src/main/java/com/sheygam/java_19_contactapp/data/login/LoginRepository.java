@@ -9,7 +9,10 @@ import com.sheygam.java_19_contactapp.data.provider.store.IStoreProvider;
 import com.sheygam.java_19_contactapp.data.provider.web.Api;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import retrofit2.Response;
 
 
@@ -29,9 +32,7 @@ public class LoginRepository implements ILoginRepository{
         AuthDto authDto = new AuthDto(email,password);
 
         return Completable.fromSingle(api.login(authDto)
-                .onErrorResumeNext(throwable -> {
-                    throw new Exception("Connection error");
-                })
+                .onErrorResumeNext(throwable -> Single.error(new Exception("Connection error")))
                 .doOnSuccess(this::loginLogic));
     }
 
@@ -39,16 +40,17 @@ public class LoginRepository implements ILoginRepository{
     public Completable registration(String email, String password) {
         AuthDto authDto = new AuthDto(email,password);
 
-        return Completable.fromSingle(api.login(authDto)
-                .onErrorResumeNext(throwable -> {
-                    throw new Exception("Connection error");
-                })
+        return Completable.fromSingle(api.registration(authDto)
+                .onErrorResumeNext(throwable -> Single.error(new Exception("Connection error")))
                 .doOnSuccess(this::regLogic));
     }
 
     @Override
     public Completable isLoggined() {
-        return null;
+        if(storeProvider.isLogined()){
+            return Completable.complete();
+        }
+        return Completable.error(new Exception("Wrong read token!"));
     }
 
 

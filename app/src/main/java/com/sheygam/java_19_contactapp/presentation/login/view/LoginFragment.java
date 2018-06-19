@@ -16,6 +16,7 @@ import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.MvpFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.sheygam.java_19_contactapp.R;
+import com.sheygam.java_19_contactapp.presentation.contactlist.view.ContactListFragment;
 import com.sheygam.java_19_contactapp.presentation.login.presenter.LoginPresenter;
 
 import java.util.List;
@@ -86,7 +87,14 @@ public class LoginFragment extends MvpAppCompatFragment implements ILoginView{
 
     @Override
     public void showNextView() {
-        //ToDo show ContactList
+        if (getFragmentManager() != null) {
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.root,new ContactListFragment())
+                    .commit();
+        }else{
+            showError("Application error!");
+        }
     }
 
     @Override

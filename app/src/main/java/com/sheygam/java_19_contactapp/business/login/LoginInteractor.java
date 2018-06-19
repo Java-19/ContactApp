@@ -41,7 +41,7 @@ public class LoginInteractor implements ILoginInteractor{
 
     @Override
     public Completable isLoggined() {
-        return null;
+        return repository.isLoggined();
     }
 
     private boolean isEmailValid(String email){

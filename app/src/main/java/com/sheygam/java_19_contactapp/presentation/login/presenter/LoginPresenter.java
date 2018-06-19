@@ -9,6 +9,9 @@ import com.sheygam.java_19_contactapp.business.login.PasswordValidException;
 import com.sheygam.java_19_contactapp.di.login.LoginModule;
 import com.sheygam.java_19_contactapp.presentation.login.view.ILoginView;
 
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -29,6 +32,22 @@ public class LoginPresenter extends MvpPresenter<ILoginView> implements ILoginPr
         App.get().plus(new LoginModule()).inject(this);
     }
 
+
+    @Override
+    protected void onFirstViewAttach() {
+        getViewState().showProgress();
+        disposable = interactor.isLoggined()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    getViewState().hideProgress();
+                    getViewState().showNextView();
+                }, throwable -> {
+                    getViewState().hideProgress();
+                    getViewState().showError("Auth error! Please login again!");
+                });
+    }
+
     @Override
     public void login(String email, String password) {
         getViewState().showProgress();
@@ -36,13 +55,6 @@ public class LoginPresenter extends MvpPresenter<ILoginView> implements ILoginPr
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::loginSuccess,this::loginError);
-//        .subscribe(() -> {
-//            getViewState().hideProgress();
-//            getViewState().showNextView();
-//        }, throwable -> {
-//            getViewState().hideProgress();
-//            getViewState().showError(throwable.getMessage());
-//        });
     }
 
     private void loginError(Throwable throwable) {
